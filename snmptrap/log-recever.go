@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 )
 
-type tailtracerReceiver struct{
+type snmptrapReceiver struct{
 	host component.Host
 	cancel context.CancelFunc
 	logger *zap.Logger
@@ -17,12 +17,12 @@ type tailtracerReceiver struct{
 	config *Config
 }
 
-func (tailtracerRcvr *tailtracerReceiver) Start(ctx context.Context, host component.Host) error {
-	tailtracerRcvr.host = host
+func (snmptrapRcvr *snmptrapReceiver) Start(ctx context.Context, host component.Host) error {
+	snmptrapRcvr.host = host
 	ctx = context.Background()
-	ctx, tailtracerRcvr.cancel = context.WithCancel(ctx)
+	ctx, snmptrapRcvr.cancel = context.WithCancel(ctx)
 
-	interval, _ := time.ParseDuration(tailtracerRcvr.config.Interval)
+	interval, _ := time.ParseDuration("1m")
 	go func() {
 		ticker:= time.NewTicker(interval)
 		defer ticker.Stop()
@@ -30,8 +30,7 @@ func (tailtracerRcvr *tailtracerReceiver) Start(ctx context.Context, host compon
 		for {
 			select {
 			case <- ticker.C:
-				tailtracerRcvr.logger.Info("I should start processing traces now!")
-				tailtracerRcvr.nextConsumer.ConsumeTraces(ctx, generateTraces(tailtracerRcvr.config.NumberOfTraces))
+				snmptrapRcvr.logger.Info("I should start processing logs now!")
 			case <- ctx.Done():
 				return
 			}
@@ -41,8 +40,8 @@ func (tailtracerRcvr *tailtracerReceiver) Start(ctx context.Context, host compon
 	return nil
 }
 
-func (tailtracerRcvr *tailtracerReceiver) Shutdown(ctx context.Context) error {
-	tailtracerRcvr.cancel()
+func (snmptrapRcvr *snmptrapReceiver) Shutdown(ctx context.Context) error {
+	snmptrapRcvr.cancel()
 	return nil
 }
 

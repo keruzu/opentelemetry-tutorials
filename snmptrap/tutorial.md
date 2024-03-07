@@ -8,7 +8,7 @@ Here's how OpenTelemetry thinks of a [log](https://opentelemetry.io/docs/concept
 
     A log is a timestamped text record, either structured (recommended) or unstructured, with metadata.
 
-In order to implement a traces receiver you will need the following:
+In order to implement a logs receiver you will need the following:
 
 * A `Config` implementation to enable the log receiver to gather and validate its configurations within the Collector’s `config.yaml`.
 * A `receiver.Factory` implementation so the Collector can properly instantiate the log receiver component.
