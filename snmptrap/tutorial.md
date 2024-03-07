@@ -48,6 +48,14 @@ across multiple systems. And when we use these network events, we're more likely
 
 Also, there's already a tutorial for traces, but not for logs.
 
+# Pre-requisite Software Installation
+In order to perform the testing later on, we'll need to ensure that we have the necessary SNMP command-line utilities installed.
+
+On RHEL-type systems:
+
+   % sudo dnf install net-snmp net-snmp-utils net-snmp-libs net-snmp-agent-libs
+
+
 
 # Copying an Existing Receiver
 We will use much of the configuration from the [snmpreceiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/snmpreceiver) as
