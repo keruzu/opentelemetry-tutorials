@@ -1,0 +1,19 @@
+type: snmptrap
+
+status:
+  class: receiver
+  stability:
+    alpha: [traces]
+  distributions: []
+  codeowners:
+    active: [keruzu]
+
+tests:
+  config:
+    metrics:
+      m1:
+        unit: "1"
+        gauge:
+          value_type: int
+        scalar_oids:
+          - oid: ".1"
