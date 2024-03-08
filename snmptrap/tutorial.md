@@ -131,4 +131,93 @@ Here's what our generated file looks like:
 	    return settings.TracerProvider.Tracer(scopeName)
     }
 
+## Working with Go Workspaces
+If you followed the previous tutorial, you will be using Go [Workspaces](https://go.dev/doc/tutorial/workspaces) so we'll need to do a few quick updates
+before we can start testing or doing other work.
+
+    % pwd
+    /your/path/here/snmptrap
+    % cd ..
+    % go work use snmptrap
+    % cd snmptrap
+    % go mod init
+    % go mod tidy
+
+This will rebuild the `go.work` file and allow you to build and test the modules
+
+# Building out a Sane `config.go` with Unit Testing
+Here's our plan of action from here:
+
+1. Rename all of the module packaes to `snmptrap`
+1. Remove references to metrics, scraper helpers and anything that refers to polling
+1. Rename the `Endpoint` configuration to instead talk about `ListenAddres` as we're not polling for data, we're receiving packets
+1. Move the unit tests out of the way until `go build` works
+1. Move the `config.go` unit test back in and fix things until `go test` works
+
+I'm going to spare you the drudgery of the above and get us to this point.
+
+Here's the contents of our `config.go`
+
+FIXME: add the config.go contents here
+
+# Adding `Start()` and `Shutdown()` Functions
+Now we're ready to start listening!
+
+Our `factory.go` contents showing the details:
+
+FIXME: add the factory.go
+
+
+
+## A Little More About SNMP Traps
+There are a number of [PDU structures](https://cdpstudio.com/manual/cdp/snmpio/about-snmp.html) for SNMP communications.
+[RFC 3416](https://www.ietf.org/rfc/rfc3416.txt) introduces the SNMP v2 trap PDU, for reference.
+
+If you need an authoritative reference, this tutorial is not it.
+
+Here's an outline of the key metadata that we have:
+
+* PDU type
+* Length
+* Enterprise OID
+* Agent Address (ie the thing sending the trap)
+* Generic Trap Type
+* Specific Trap number
+* Time stamp
+* List of varbinds (eg OIDs + values)
+
+There are two trap types:
+
+* Generic traps: `coldStart`, `warmStart`, `linkDown`, `linkUp`, `authenticationFailure`, and `egpNeighborLoss`
+* Enterprise-specific traps: traps defined by the vendor of the device
+
+A trap will provide with OID indices, which will look something like: `1.3.6.1.4.1. ....`
+This represents a hierarchical tree of dots and numbers, with meaning according to the RFCs and assigned by a numbering authority.
+A MIB can be used to convert the numbers to names, with the idea being that you can map numbers to names like DNS maps IP addresses to FQDN names.
+
+Note that in theory everything is well-ordered, well-defined and everything can be uniquely determined in a "simple" way. For instance, each vendor
+will have their own MIB that defines the data so that it can be uniquely compiled, and there are no name clashes, badly ordered names and everything is consistent.
+Much like web browsers and HTML, there's a lot in the history of SNMP that can and has gone wrong in practice.
+
+For our purposes, we'd like to capture the essential metadata from our traps, and create a key/value store with our OIDs indices and their values.
+We can then pass this through another layer (eg an OTel Collector processor or an actual SNMP manager) to convert to human-friendly names and then
+even later on be able to respond appropriately to the trap.
+
+
+# About SNMP Trap Processing Performance
+Note that the kernel UDP buffer ring stores UDP packets (eg our SNMP traps), and this is buffer is overwritten with new incoming UDP
+packets as time goes on. Our goal is to be able to process the contents of this buffer as fast as possible so that we can actually
+keep pace with the oncoming stream of SNMP packets.
+
+There are a few things we can do:
+
+* tune the kernel to request more UDP buffer space to increase the total size of the ring buffer
+FIXME: indicate the Linux kernel parameter
+* ensure that we can specify a big UDP buffer size so that we can hint to the kernel that we care about those packets
+FIXME: verify the above statement
+* ensure that our code is as performant as possible
+* drop any packets we don't care about as soon as possible
+* add a load balancer in front of this and spin up more containers, processes or whatever
+
+There are options, but we are going to ingore them all at this point.
 
