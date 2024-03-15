@@ -20,25 +20,3 @@ func newConfigHelper(cfg *Config) *configHelper {
 	return &ch
 }
 
-
-// getAttributeConfigValue returns the value of an attribute config
-func (h configHelper) getAttributeConfigValue(name string) string {
-	attrConfig := h.cfg.Attributes[name]
-	if attrConfig == nil {
-		return ""
-	}
-
-	return attrConfig.Value
-}
-
-// getAttributeConfigIndexedValuePrefix returns the indexed value prefix of an attribute config
-func (h configHelper) getAttributeConfigIndexedValuePrefix(name string) string {
-	attrConfig := h.cfg.Attributes[name]
-	if attrConfig == nil {
-		return ""
-	}
-
-	return attrConfig.IndexedValuePrefix
-}
-
-

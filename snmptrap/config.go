@@ -92,13 +92,8 @@ type Config struct {
 	// Only valid for version “v3” and if "auth_priv" is selected for SecurityLevel
 	PrivacyPassword configopaque.String `mapstructure:"privacy_password"`
 
-	// ResourceAttributes defines what resource attributes will be used for this receiver and is composed
-	// of resource attribute names along with their resource attribute configurations
-	ResourceAttributes map[string]*ResourceAttributeConfig `mapstructure:"resource_attributes"`
-
-	// Attributes defines what attributes will be used on metrics for this receiver and is composed of
-	// attribute names along with their attribute configurations
-	Attributes map[string]*AttributeConfig `mapstructure:"attributes"`
+	// CloseTimeout is the max wait time for the socket to gracefully signal its closure.
+	CloseTimeout time.Duration `mapstructure:"listener_close_timeout"`
 
 }
 
@@ -282,30 +277,6 @@ func validatePrivacy(cfg *Config) error {
 }
 
 
-
-// validateAttributeConfigs validates the AttributeConfigs
-func validateAttributeConfigs(cfg *Config) error {
-	var combinedErr error
-
-	attributes := cfg.Attributes
-	if len(attributes) == 0 {
-		return nil
-	}
-
-	return combinedErr
-}
-
-// validateResourceAttributeConfigs validates the ResourceAttributeConfigs
-func validateResourceAttributeConfigs(cfg *Config) error {
-	var combinedErr error
-
-	resourceAttributes := cfg.ResourceAttributes
-	if len(resourceAttributes) == 0 {
-		return nil
-	}
-
-	return combinedErr
-}
 
 // contains checks if string slice contains a string value
 func contains(elements []string, value string) bool {

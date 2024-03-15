@@ -32,6 +32,8 @@ SNMP is typically based on UDP, but can be configured to run on TCP.
 
 For simplicity, anywhere you see the word `traps` assume that it could read `traps` or `informs`.
 
+We will use the [gosnmp library](https://github.com/gosnmp/gosnmp) to receive traps.
+
 # Logs vs Traces
 Whenever you create a receiver, you have to ask yourself "What is the most appropriate use for the collected data?"
 
